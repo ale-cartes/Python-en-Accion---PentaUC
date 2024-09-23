@@ -157,3 +157,48 @@ def secante(func, x0, x1, tol=1e-8, max_iter=1_000, verbose=False):
         print(f"La raíz encontrada en {n_iter} iteraciones es {x2}")
 
     return x2
+
+
+def riemann_sum(func, a, b, n, tipo='right'):
+    """
+    Función que calcula la suma de Riemann de una función en
+    un cierto intervalo [a, b] con n subintervalos.
+    
+    inputs:
+    =======
+    func: función a obtener el área bajo la curva
+    a, b: límites del intervalo
+    n: número de subintervalos
+    tipo: tipo de suma de Riemann a calcular (right, left, center)
+    
+    output:
+    =======
+    suma_areas: suma de Riemann de la función en el intervalo [a, b]
+    
+    Ejemplo:
+    ========
+    >>> f = lambda x: x**2
+    >>> riemann_sum(f, 0, 1, 1000, 'right')
+    0.33383350000000034
+    """
+
+    if not (tipo in ['left', 'right', 'center']):
+        print("los tipos admitidos son: left, right y center")
+        return None
+    
+    suma_areas = 0
+    dx = (b - a) / n
+    
+    for i in range(n):
+        if tipo == 'left':
+            x_ev = a + i * dx
+        
+        elif tipo == 'right':
+            x_ev = a + (i + 1) * dx
+        
+        else:  # center
+            x_ev = a + (i + 1/2) * dx
+            
+        suma_areas += dx * func(x_ev)
+    
+    return suma_areas
