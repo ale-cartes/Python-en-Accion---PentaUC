@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
 def biseccion(func, a, b, tol=1e-8, max_iter=1_000, verbose=False):
     """
     Calcula la raíz de una función utilizando el método de bisección.
@@ -204,3 +207,30 @@ def riemann_sum(func, a, b, n, tipo='right'):
     suma_areas = suma_lados * dx
 
     return suma_areas
+
+def grafico_barras(lanzamientos, porcentaje=False):
+    """
+    Función que grafica un histograma de los resultados de una
+    serie de lanzamientos.
+    
+    Inputs:
+    =======
+    lanzamientos: lista de resultados de los lanzamientos
+    porcentaje: si es True, se grafica el porcentaje de cada resultado
+    
+    Output:
+    =======
+    Gráfico de barras con los resultados de los lanzamientos
+    """
+    n = len(lanzamientos)
+    
+    counts = np.unique(lanzamientos, return_counts=True)
+    etiquetas = counts[0]
+    valores = counts[1] / n * 100 if porcentaje else counts[1]
+
+    plt.bar(etiquetas, valores, edgecolor='black')
+    plt.xlabel('Resultado')
+    plt.ylabel('Frecuencia (%)' if porcentaje else 'Frecuencia')
+    plt.grid(ls=':')
+    
+    plt.show()
