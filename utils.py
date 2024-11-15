@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def biseccion(func, a, b, tol=1e-8, max_iter=1_000, verbose=False):
     """
     Calcula la raíz de una función utilizando el método de bisección.
@@ -208,22 +209,23 @@ def riemann_sum(func, a, b, n, tipo='right'):
 
     return suma_areas
 
+
 def grafico_barras(lanzamientos, porcentaje=False):
     """
     Función que grafica un histograma de los resultados de una
     serie de lanzamientos.
-    
+
     Inputs:
     =======
     lanzamientos: lista de resultados de los lanzamientos
     porcentaje: si es True, se grafica el porcentaje de cada resultado
-    
+
     Output:
     =======
     Gráfico de barras con los resultados de los lanzamientos
     """
     n = len(lanzamientos)
-    
+
     counts = np.unique(lanzamientos, return_counts=True)
     etiquetas = counts[0]
     valores = counts[1] / n * 100 if porcentaje else counts[1]
@@ -232,5 +234,47 @@ def grafico_barras(lanzamientos, porcentaje=False):
     plt.xlabel('Resultado')
     plt.ylabel('Frecuencia (%)' if porcentaje else 'Frecuencia')
     plt.grid(ls=':')
-    
+
     plt.show()
+
+
+def circ_en_cuadro(r, cuarto=True):
+    """
+    Función que grafica una circunferencia de radio r en un cuadrado
+    de lado r
+
+    Inputs:
+    =======
+    r: float
+        radio de la circunferencia
+
+    cuarto: bool, opcional
+        si es True, se grafica solo un cuarto de la circunferencia
+        si es False, se grafica la mitad de la circunferencia inscrito
+        en un rectángulo de lado 2r y altura r
+
+    Output:
+    =======
+    fig, ax: figuras de matplotlib
+
+    Ejemplo:
+    ========
+    >>> fig, ax = circ_en_cuadro(1)
+    """
+    x_inicio = 0 if cuarto else -r
+
+    fig, ax = plt.subplots(figsize=(5, 5),
+                           subplot_kw={'aspect': 'equal'})
+    zorder = 10
+    # cuadrado
+    ax.hlines([0, r], xmin=x_inicio, xmax=r,
+              color="black", zorder=zorder)
+    ax.vlines([x_inicio, r], ymin=0, ymax=r,
+              color="black", zorder=zorder)
+
+    # circunferencia
+    x = np.linspace(x_inicio, r, 250)
+    y = np.sqrt(r**2 - x**2)
+    ax.plot(x, y, color='black', zorder=zorder)
+
+    return fig, ax
