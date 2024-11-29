@@ -1,5 +1,6 @@
-import matplotlib.pyplot as plt
-import numpy as np
+import matplotlib.pyplot as plt_u
+import numpy as np_u
+import numpy.random as np_u_rand
 
 
 def biseccion(func, a, b, tol=1e-8, max_iter=1_000, verbose=False):
@@ -53,11 +54,13 @@ def biseccion(func, a, b, tol=1e-8, max_iter=1_000, verbose=False):
         return None
 
     if func(a) == 0:
-        print("El límite inferior es la raíz")
+        if verbose:
+            print("El límite inferior es la raíz")
         return a
 
     if func(b) == 0:
-        print("El límite superior es la raíz")
+        if verbose:
+            print("El límite superior es la raíz")
         return b
 
     x_centro = (a + b) / 2
@@ -226,16 +229,16 @@ def grafico_barras(lanzamientos, porcentaje=False):
     """
     n = len(lanzamientos)
 
-    counts = np.unique(lanzamientos, return_counts=True)
+    counts = np_u.unique(lanzamientos, return_counts=True)
     etiquetas = counts[0]
     valores = counts[1] / n * 100 if porcentaje else counts[1]
 
-    plt.bar(etiquetas, valores, edgecolor='black')
-    plt.xlabel('Resultado')
-    plt.ylabel('Frecuencia (%)' if porcentaje else 'Frecuencia')
-    plt.grid(ls=':')
+    plt_u.bar(etiquetas, valores, edgecolor='black')
+    plt_u.xlabel('Resultado')
+    plt_u.ylabel('Frecuencia (%)' if porcentaje else 'Frecuencia')
+    plt_u.grid(ls=':')
 
-    plt.show()
+    plt_u.show()
 
 
 def circ_en_cuadro(r, cuarto=True):
@@ -263,8 +266,8 @@ def circ_en_cuadro(r, cuarto=True):
     """
     x_inicio = 0 if cuarto else -r
 
-    fig, ax = plt.subplots(figsize=(5, 5),
-                           subplot_kw={'aspect': 'equal'})
+    fig, ax = plt_u.subplots(figsize=(5, 5),
+                             subplot_kw={'aspect': 'equal'})
     zorder = 10
     # cuadrado
     ax.hlines([0, r], xmin=x_inicio, xmax=r,
@@ -273,8 +276,168 @@ def circ_en_cuadro(r, cuarto=True):
               color="black", zorder=zorder)
 
     # circunferencia
-    x = np.linspace(x_inicio, r, 250)
-    y = np.sqrt(r**2 - x**2)
+    x = np_u.linspace(x_inicio, r, 250)
+    y = np_u.sqrt(r**2 - x**2)
     ax.plot(x, y, color='black', zorder=zorder)
 
     return fig, ax
+
+
+# Evaluación final
+
+def lago_simulador(radio=20, num_points=10_000, seed=42):
+    """
+    Función que simula un lago con una forma realista.
+
+    Inputs:
+    =======
+
+    radio: float, opcional
+        radio del lago
+
+    num_points: int, opcional
+        número de puntos a simular
+
+    seed: int, opcional
+        semilla para reproducibilidad
+
+    Output:
+    =======
+    x_realista, y_realista: coordenadas de los puntos del lago
+
+    [radio, amplitudes, frecuencias]: parámetros de la forma realista
+    """
+
+    np_u_rand.seed(seed)
+
+    theta = np_u.linspace(0, 2 * np_u.pi, num_points)
+    amplitudes = [np_u_rand.uniform(radio * 0.05, radio * 0.15),
+                  np_u_rand.uniform(radio * 0.02, radio * 0.1),
+                  np_u_rand.uniform(radio * 0.01, radio * 0.05)]
+
+    frecuencias = [np_u_rand.uniform(1, 5),
+                   np_u_rand.uniform(5, 10),
+                   np_u_rand.uniform(10, 25)]
+
+    radio_realista = np_u.sum([amplitudes[i] * np_u.sin(frecuencias[i] * theta)
+                               for i in range(3)], axis=0)
+
+    radio_realista += radio
+
+    x_lago = radio_realista * np_u.cos(theta)
+    y_lago = radio_realista * np_u.sin(theta)
+
+    return x_lago, y_lago, [radio, amplitudes, frecuencias]
+
+
+def plot_rectangulo(x_min, x_max, y_min, y_max):
+    """
+    Función que grafica un rectángulo en un plano cartesiano.
+
+    Inputs:
+    =======
+    x_min, x_max: float
+        límites en el eje x
+    y_min, y_max: float
+        límites en el eje y
+
+    Output:
+    =======
+    Gráfico con el rectángulo dibujado
+    """
+
+    plt_u.hlines([y_min, y_max], xmin=x_min, xmax=x_max, color='black',
+                 ls='--', lw=1)
+    plt_u.vlines([x_min, x_max], ymin=y_min, ymax=y_max, color='black',
+                 ls='--', lw=1)
+
+    pass
+
+
+def dentro_del_lago(x, y, datos_lago):
+    """
+    Función que verifica si un punto (x, y) está dentro del lago.
+
+    Inputs:
+    =======
+    x: float
+        coordenada x del punto
+
+    y: float
+        coordenada y del punto
+
+    datos_lago: lista
+        parámetros del lago generado con lago_simulador
+
+    Output:
+    =======
+    bool: True si el punto está dentro del lago, False caso contrario
+    """
+    distancia = np_u.sqrt(x**2 + y**2)
+
+    theta = np_u.arctan2(y, x)
+
+    if theta < 0:
+        theta += 2 * np_u.pi
+
+    radio, amplitudes, frecuencias = datos_lago
+
+    radio_lago = np_u.sum([amplitudes[i] * np_u.sin(frecuencias[i] * theta)
+                           for i in range(3)], axis=0)
+
+    radio_lago += radio
+
+    if distancia <= radio_lago:
+        return True
+
+    return False
+
+
+def plot_circunferencia(x_centro, y_centro, r, color=None):
+    """
+    Función que grafica una circunferencia en un plano cartesiano.
+
+    Inputs:
+    =======
+    x_centro, y_centro: float
+        coordenadas del centro de la circunferencia
+
+    r: float
+        radio de la circunferencia
+
+    color: str, opcional
+        color de la circunferencia
+
+    Output:
+    =======
+    Gráfico con la circunferencia dibujada
+    """
+
+    theta = np_u.linspace(0, 2 * np_u.pi, 1_000)
+    x = x_centro + r * np_u.cos(theta)
+    y = y_centro + r * np_u.sin(theta)
+
+    plt_u.plot(x, y, color=color)
+
+    pass
+
+
+def exponencial_taylor(x, n):
+    """
+    Función que calcula la aproximación de la función exponencial
+    mediante la serie de Taylor.
+
+    Inputs:
+    =======
+    x: float
+        valor en el que se evalúa la función
+
+    n: int
+        número de términos de la serie de Taylor
+
+    Output:
+    =======
+    float: aproximación de la función exponencial en x
+    """
+
+    return np_u.sum([x**i / np_u.math.factorial(i) for i in range(n)])
